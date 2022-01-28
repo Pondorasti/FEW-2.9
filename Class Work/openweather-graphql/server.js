@@ -2,6 +2,7 @@ const express = require("express")
 const { graphqlHTTP } = require("express-graphql")
 const { buildSchema } = require("graphql")
 const fetch = require("node-fetch")
+const cors = require("cors")
 require("dotenv").config()
 
 const schema = buildSchema(`
@@ -71,6 +72,8 @@ const root = {
 }
 
 const app = express()
+
+app.use(cors())
 
 app.use(
   "/graphql",
