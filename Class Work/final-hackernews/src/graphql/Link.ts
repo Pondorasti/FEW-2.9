@@ -10,26 +10,13 @@ export const Link = objectType({
   }
 })
 
-let links: NexusGenObjects["Link"][]= [   // 1
-  {
-      id: 1,
-      url: "www.howtographql.com",
-      description: "Fullstack tutorial for GraphQL",
-  },
-  {
-      id: 2,
-      url: "graphql.org",
-      description: "GraphQL official website",
-  },
-];
-
 export const FeedQuery = extendType({
   type: "Query",
   definition(t) {
     t.nonNull.list.nonNull.field("feed", {
       type: "Link",
-      resolve(parent, args, context, info) {
-        return links
+      resolve(parent, args, context) {
+        return context.prisma.link.findMany()
       }
     })
   }
@@ -43,9 +30,11 @@ export const LinkQuery = extendType({
       args: {
         id: nonNull(intArg())
       },
-      resolve(parent, args) {
+      resolve(parent, args, context) {
         const { id } = args
-        const link = links.find((link) => link.id === id)!
+        const link = context.prisma.link.findUnique({
+          where: { id }
+        })
 
         return link
       }
@@ -65,16 +54,11 @@ export const PostMutation = extendType({
       },
       resolve(parent, args, context) {
         const { description, url } = args
+        const newLink = context.prisma.link.create({ 
+          data: { description,url }
+        })
 
-        let idCount = links.length + 1
-        const link = {
-          id: idCount,
-          description: description,
-          url: url
-        }
-        links.push(link)
-
-        return link
+        return newLink
       }
     })
   }
@@ -83,19 +67,46 @@ export const PostMutation = extendType({
 export const UpdateMutation = extendType({
   type: "Mutation",
   definition(t) {
-    t.nonNull.field("updateLink", {
+    t.field("updateLink", {
       type: "Link",
       args: {
         id: nonNull(intArg()),
         url: stringArg(),
         description: stringArg()
       },
-      resolve(parent, args) {
+      resolve(parent, args, context) {
         const {id, url, description} = args
-        const link = links.find((link) => link.id === id)!
+        // const linkCount = context.prisma.link.count({
+        //   where: { id }
+        // })
+        // if (linkCount === 0) return null
 
-        if (url) link.url = url
-        if (description) link.description = description
+        const updatedLink = context.prisma.link.update({
+          where: { id },
+          data: { 
+            url: url ?? undefined, 
+            description: description ?? undefined 
+          }
+        })
+        return updatedLink
+      }
+    })
+  }
+})
+
+export const DeleteMutation = extendType({
+  type: "Mutation",
+  definition(t) {
+    t.field("deleteLink", {
+      type: "Link",
+      args: {
+        id: nonNull(intArg())
+      },
+      resolve(parent, args, context) {
+        const { id } = args
+        const link  = context.prisma.link.delete({
+          where: { id }
+        })
 
         return link
       }
