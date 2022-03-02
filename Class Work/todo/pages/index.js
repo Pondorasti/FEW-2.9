@@ -1,5 +1,6 @@
 import Head from "next/head"
 import { gql, useQuery } from "@apollo/client"
+import { Button } from "@nextui-org/react"
 
 const getAllTodos = gql`
   query {
@@ -19,7 +20,7 @@ export default function Home() {
       <Head>
         <title>Todo</title>
       </Head>
-
+      <Button>Click me</Button>
       <main>{loading ? "Loading" : "helo"}</main>
     </div>
   )

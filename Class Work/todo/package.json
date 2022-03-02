@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@apollo/client": "^3.5.10",
+    "@nextui-org/react": "^1.0.2-beta.4",
     "apollo-server-core": "^3.6.3",
     "apollo-server-micro": "^3.6.3",
     "graphql": "^16.3.0",
