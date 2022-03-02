@@ -21,7 +21,10 @@ export default function Home() {
         <title>Todo</title>
       </Head>
       <Button>Click me</Button>
-      <main>{loading ? "Loading" : "helo"}</main>
+      <main>
+        {loading ? "Loading" : "helo"}
+        <h1 className="text-3xl font-bold underline">Hello world!</h1>
+      </main>
     </div>
   )
 }
