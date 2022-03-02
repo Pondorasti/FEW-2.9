@@ -5,21 +5,33 @@ const typeDefs = gql`
   type Todo {
     id: ID!
     name: String!
-    date: String!
     completed: String!
   }
 
   type Query {
     getAllTodos: [Todo!]!
     getTodo(id: ID!): Todo
-    # getCompletedTodo
+    # getCompletedTodos: [Todo!]!
+  }
+
+  type Mutation {
+    addTodo(name: String!): Todo!
   }
 `
+
+let todos = []
 
 const resolvers = {
   Query: {
     getAllTodos: () => {
-      return [{ id: "1", name: "hello", date: "Today", completed: false }]
+      return todos
+    },
+  },
+  Mutation: {
+    addTodo: (_, { name }) => {
+      const newTodo = { id: Math.floor(Math.random() * 10000), name, completed: false }
+      todos.push(newTodo)
+      return newTodo
     },
   },
 }
