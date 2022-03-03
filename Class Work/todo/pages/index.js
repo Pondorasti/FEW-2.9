@@ -23,10 +23,23 @@ const addTodoMutation = gql`
   }
 `
 
+const updateTodoMutation = gql`
+  mutation UpdateTodo($id: ID!, $completed: Boolean!) {
+    updateTodo(id: $id, completed: $completed) {
+      name
+      completed
+      id
+    }
+  }
+`
+
 export default function Home() {
   const textInput = useRef(null)
   const { loading, error, data } = useQuery(getAllTodos)
-  const [addTodo, { _, addLoading, addError }] = useMutation(addTodoMutation, {
+  const [addTodo, { _0, addLoading, addError }] = useMutation(addTodoMutation, {
+    refetchQueries: [getAllTodos],
+  })
+  const [updateTodo, { _1, updateLoading, updateError }] = useMutation(updateTodoMutation, {
     refetchQueries: [getAllTodos],
   })
 
@@ -82,13 +95,25 @@ export default function Home() {
             }
           />
         </form>
+
         {error && <Text color="error">{error}</Text>}
         {addError && <Text color="error">{addError}</Text>}
+        {updateError && <Text color="error">{updateError}</Text>}
+
         {loading ? (
           <Loading />
         ) : (
           data.getAllTodos.map((item) => (
-            <Checkbox key={item.id} color="primary" line className="font-sans">
+            <Checkbox
+              key={item.id}
+              color="primary"
+              line
+              className="font-sans"
+              checked={item.completed}
+              onChange={() => {
+                updateTodo({ variables: { id: item.id, completed: !item.completed } })
+              }}
+            >
               {item.name}
             </Checkbox>
           ))

@@ -5,17 +5,19 @@ const typeDefs = gql`
   type Todo {
     id: ID!
     name: String!
-    completed: String!
+    completed: Boolean!
+    date: String!
   }
 
   type Query {
     getAllTodos: [Todo!]!
     getTodo(id: ID!): Todo
-    # getCompletedTodos: [Todo!]!
+    getCompletedTodos: [Todo!]!
   }
 
   type Mutation {
     addTodo(name: String!): Todo!
+    updateTodo(id: ID!, completed: Boolean): Todo
   }
 `
 
@@ -24,14 +26,32 @@ let todos = []
 const resolvers = {
   Query: {
     getAllTodos: () => {
-      return todos
+      return todos.sort((a, b) => b.date - a.date)
+    },
+    getTodo: (_, { id }) => {
+      return todos.find((value) => value.id == id)
+    },
+    getCompletedTodos: () => {
+      return todos.filter((value) => value.completed)
     },
   },
   Mutation: {
     addTodo: (_, { name }) => {
-      const newTodo = { id: Math.floor(Math.random() * 10000), name, completed: false }
+      const newTodo = {
+        id: Math.floor(Math.random() * 10000),
+        name,
+        completed: false,
+        date: new Date(),
+      }
       todos.push(newTodo)
       return newTodo
+    },
+    updateTodo: (_, { id, completed }) => {
+      const todo = todos.find((value) => value.id == id)
+      if (!todo) return null
+
+      todo.completed = completed
+      return todo
     },
   },
 }
